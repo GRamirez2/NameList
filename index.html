@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stand Up List</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4c63d2 0%, #5a67d8 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+    }
+
+    .mode-toggle {
+      margin-top: 20px;
+    }
+
+    .toggle-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      margin: 0 5px;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .toggle-btn.active {
+      background: white;
+      color: #4c63d2;
+      transform: translateY(-2px);
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .admin-section {
+      margin-bottom: 40px;
+      padding: 30px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 15px;
+      color: white;
+    }
+
+    .admin-section h2 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      font-weight: 300;
+    }
+
+    .add-name-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .add-name-input {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .add-btn,
+    .clear-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .add-btn:hover,
+    .clear-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .names-list {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .name-item {
+      display: flex;
+      align-items: center;
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .name-item:last-child {
+      border-bottom: none;
+    }
+
+    .name-item:hover {
+      background: rgba(102, 126, 234, 0.05);
+      transform: translateX(5px);
+    }
+
+    .name-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
+
+    .name-radio {
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
+
+    .name-text {
+      flex: 1;
+      font-size: 1.1rem;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .name-item:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .delete-btn:hover {
+      background: #ff5252;
+      transform: scale(1.1);
+    }
+
+    .user-section h2 {
+      margin-bottom: 30px;
+      color: #333;
+      font-size: 2rem;
+      font-weight: 300;
+      text-align: center;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state h3 {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      font-weight: 300;
+    }
+
+    .selection-type {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 10px;
+      color: #4c63d2;
+      font-weight: 500;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .name-item {
+      animation: slideIn 0.3s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Stand Up Report</h1>
+      <div class="mode-toggle">
+        <button class="toggle-btn active" onclick="switchMode('user')">User Mode</button>
+        <button class="toggle-btn" onclick="switchMode('admin')">Admin Mode</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Admin Section -->
+      <div id="adminSection" class="admin-section" style="display: none;">
+        <h2>Admin Panel</h2>
+        <div class="add-name-form">
+          <input type="text" class="add-name-input" id="nameInput" placeholder="Enter a name..."
+            onkeypress="handleKeyPress(event)">
+          <button class="add-btn" onclick="addName()">Add Name</button>
+          <button class="clear-btn" onclick="clearAllNames()">Clear All</button>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="color: white; margin-right: 20px;">
+            <input type="radio" name="inputType" value="checkbox" checked onchange="setInputType('checkbox')"
+              style="margin-right: 8px;">
+            Checkboxes (multiple selection)
+          </label>
+          <!-- <label style="color: white;">
+            <input type="radio" name="inputType" value="radio" onchange="setInputType('radio')"
+              style="margin-right: 8px;">
+            Radio buttons (single selection)
+          </label> -->
+        </div>
+      </div>
+
+      <!-- User Section -->
+      <div id="userSection">
+        <h2>Name List</h2>
+        <div class="selection-type" id="selectionType">
+          Team Members
+        </div>
+        <div class="names-list" id="namesList">
+          <div class="empty-state">
+            <h3>No names added yet</h3>
+            <p>Switch to Admin Mode to add names to the list</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let names = [];
+    let isAdminMode = false;
+    let inputType = 'checkbox';
+
+    function switchMode(mode) {
+      const adminBtn = document.querySelector('.toggle-btn:last-child');
+      const userBtn = document.querySelector('.toggle-btn:first-child');
+      const adminSection = document.getElementById('adminSection');
+
+      console.log('mode', mode)
+      if (mode === 'admin') {
+        isAdminMode = true;
+        adminBtn.classList.add('active');
+        userBtn.classList.remove('active');
+        adminSection.style.display = 'block';
+      } else {
+        isAdminMode = false;
+        adminBtn.classList.remove('active');
+        userBtn.classList.add('active');
+        adminSection.style.display = 'none';
+      }
+    }
+
+    function setInputType(type) {
+      inputType = type;
+      const selectionType = document.getElementById('selectionType');
+      if (type === 'checkbox') {
+        selectionType.textContent = 'Multiple selection enabled (checkboxes)';
+      } else {
+        selectionType.textContent = 'Single selection enabled (radio buttons)';
+      }
+      renderNames();
+    }
+
+    function addName() {
+      const input = document.getElementById('nameInput');
+      const name = input.value.trim();
+
+      if (name && !names.includes(name)) {
+        names.push(name);
+        input.value = '';
+        renderNames();
+      }
+    }
+
+    function deleteName(index) {
+      names.splice(index, 1);
+      renderNames();
+    }
+
+    function clearAllNames() {
+      names = [];
+      renderNames();
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        addName();
+      }
+    }
+
+    function renderNames() {
+      const namesList = document.getElementById('namesList');
+
+      if (names.length === 0) {
+        namesList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No names added yet</h3>
+                        <p>Switch to Admin Mode to add names to the list</p>
+                    </div>
+                `;
+        return;
+      }
+
+      namesList.innerHTML = names.map((name, index) => `
+                <div class="name-item">
+                    <input 
+                        type="${inputType}" 
+                        ${inputType === 'radio' ? 'name="nameSelection"' : ''} 
+                        class="name-${inputType}" 
+                        id="name-${index}"
+                        value="${name}"
+                    >
+                    <label class="name-text" for="name-${index}">${name}</label>
+                    ${isAdminMode ? `<button class="delete-btn" onclick="deleteName(${index})">Delete</button>` : ''}
+                </div>
+            `).join('');
+    }
+
+    // Initialize with some sample data
+    names = ['Oren', 'Derek', 'Paige', 'Joe', 'Orlando', 'James', 'Britt', 'Steph', 'George', 'Matt', 'Tanner', 'Other Guy 1', 'Other Guy 2'];
+    renderNames();
+  </script>
+</body>
+
+</html>
