@@ -274,9 +274,9 @@
 
       <!-- User Section -->
       <div id="userSection">
-        <h2>Name List</h2>
+        <!-- <h2>Name List</h2> -->
         <div class="selection-type" id="selectionType">
-          Team Members
+          Team MightyBytes
         </div>
         <div class="names-list" id="namesList">
           <div class="empty-state">
@@ -297,8 +297,6 @@
       const adminBtn = document.querySelector('.toggle-btn:last-child');
       const userBtn = document.querySelector('.toggle-btn:first-child');
       const adminSection = document.getElementById('adminSection');
-
-      console.log('mode', mode)
       if (mode === 'admin') {
         isAdminMode = true;
         adminBtn.classList.add('active');
@@ -310,6 +308,7 @@
         userBtn.classList.add('active');
         adminSection.style.display = 'none';
       }
+      renderNames();
     }
 
     function setInputType(type) {
