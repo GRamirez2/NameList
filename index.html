@@ -235,6 +235,10 @@
     .name-item {
       animation: slideIn 0.3s ease;
     }
+
+    .standup-list {
+      margin-top: 30px;
+    }
   </style>
 </head>
 
@@ -284,12 +288,25 @@
             <p>Switch to Admin Mode to add names to the list</p>
           </div>
         </div>
+        <div class="standup-list" id="standupList">
+          <div class="add-name-form">
+            <input type="text" class="add-name-input" id="standupNameInput" placeholder="Add parkinglot name or topic..." onkeypress="handleStandupKeyPress(event)">
+            <button class="add-btn" onclick="addStandupName()">Add</button>
+          </div>
+          <div class="names-list" id="standupNamesList">
+            <div class="empty-state">
+              <h3>Parking Lot</h3>
+              <p>Add topics or names here to capture today's parking lot items.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
     let names = [];
+    let standupNames = [];
     let isAdminMode = false;
     let inputType = 'checkbox';
 
@@ -355,8 +372,8 @@
       if (names.length === 0) {
         namesList.innerHTML = `
                     <div class="empty-state">
-                        <h3>No names added yet</h3>
-                        <p>Switch to Admin Mode to add names to the list</p>
+                      <h3>No names added yet</h3>
+                      <p>Switch to Admin Mode to add names to the list</p>
                     </div>
                 `;
         return;
@@ -377,9 +394,52 @@
             `).join('');
     }
 
+    // Standup list helpers (independent from main names)
+    function addStandupName() {
+      const input = document.getElementById('standupNameInput');
+      const name = input.value.trim();
+      if (name && !standupNames.includes(name)) {
+        standupNames.push(name);
+        input.value = '';
+        renderStandupNames();
+      }
+    }
+
+    function handleStandupKeyPress(event) {
+      if (event.key === 'Enter') {
+        addStandupName();
+      }
+    }
+
+    function deleteStandupName(index) {
+      standupNames.splice(index, 1);
+      renderStandupNames();
+    }
+
+    function renderStandupNames() {
+      const listEl = document.getElementById('standupNamesList');
+      if (!standupNames.length) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <h3>Parking Lot</h3>
+            <p>Add topics or names here to capture today's parking lot items.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = standupNames.map((name, index) => `
+        <div class="name-item">
+          <label class="name-text">${name}</label>
+          <button class="delete-btn" onclick="deleteStandupName(${index})">Delete</button>
+        </div>
+      `).join('');
+    }
+
     // Initialize with some sample data
     names = ['Oren', 'Derek', 'Paige', 'Joe', 'Eric', 'Orlando', 'James', 'Britt', 'Steph', 'George', 'Matt', 'Tanner', 'Alex P'];
     renderNames();
+    renderStandupNames();
   </script>
 </body>
 
