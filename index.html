@@ -260,6 +260,7 @@
 <body>
   <div class="container">
     <div class="header">
+      <!-- Title this what you want to call it -->
       <h1>Stand Up Report</h1>
       <div class="mode-toggle">
         <button class="toggle-btn active" onclick="switchMode('user')">User Mode</button>
@@ -283,18 +284,13 @@
               style="margin-right: 8px;">
             Checkboxes (multiple selection)
           </label>
-          <!-- <label style="color: white;">
-            <input type="radio" name="inputType" value="radio" onchange="setInputType('radio')"
-              style="margin-right: 8px;">
-            Radio buttons (single selection)
-          </label> -->
         </div>
       </div>
 
       <!-- User Section -->
       <div id="userSection">
-        <!-- <h2>Name List</h2> -->
         <div class="selection-type" id="selectionType">
+          <!-- Change Team Name Here -->
           <span id="teamName">Team MightyBytes</span>
           <button class="clear-btn clear-selections-btn" onclick="clearSelections()">Clear Selections</button>
         </div>
@@ -307,7 +303,7 @@
         <div class="standup-list" id="standupList">
           <div class="add-name-form">
             <input type="text" class="add-name-input" id="standupNameInput" placeholder="Add parkinglot name or topic..." onkeypress="handleStandupKeyPress(event)">
-            <button class="add-btn" onclick="addStandupName()">Add</button>
+            <button class="add-btn clear-selections-btn" onclick="addStandupName()">Add</button>
           </div>
           <div class="names-list" id="standupNamesList">
             <div class="empty-state">
@@ -524,7 +520,7 @@
       `).join('');
     }
 
-    // Initialize with some sample data
+    // Initialize with list of your team members
     names = ['Oren', 'Derek', 'Paige', 'Joe', 'Eric', 'Orlando', 'James', 'Britt', 'Steph', 'George', 'Matt', 'Tanner', 'Alex P'];
     loadSelectedNames();
     loadStandupNames();
