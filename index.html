@@ -121,6 +121,18 @@
       transform: translateY(-2px);
     }
 
+    .clear-selections-btn {
+      background: transparent;
+      border-color: #4c63d2;
+      color: #4c63d2;
+    }
+
+    .clear-selections-btn:hover {
+      background: #4c63d2;
+      color: #ffffff;
+      border-color: #4c63d2;
+    }
+
     .names-list {
       background: white;
       border-radius: 15px;
@@ -218,6 +230,9 @@
       border-radius: 10px;
       color: #4c63d2;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     @keyframes slideIn {
@@ -280,7 +295,8 @@
       <div id="userSection">
         <!-- <h2>Name List</h2> -->
         <div class="selection-type" id="selectionType">
-          Team MightyBytes
+          <span id="teamName">Team MightyBytes</span>
+          <button class="clear-btn clear-selections-btn" onclick="clearSelections()">Clear Selections</button>
         </div>
         <div class="names-list" id="namesList">
           <div class="empty-state">
@@ -309,6 +325,47 @@
     let standupNames = [];
     let isAdminMode = false;
     let inputType = 'checkbox';
+    let selectedNames = new Set();
+
+    function loadSelectedNames() {
+      try {
+        const raw = sessionStorage.getItem('selectedNames');
+        const arr = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(arr)) {
+          selectedNames = new Set(arr);
+        }
+      } catch (_) {
+        selectedNames = new Set();
+      }
+    }
+
+    function saveSelectedNames() {
+      try {
+        sessionStorage.setItem('selectedNames', JSON.stringify(Array.from(selectedNames)));
+      } catch (_) {
+        // ignore storage errors
+      }
+    }
+
+    function loadStandupNames() {
+      try {
+        const raw = sessionStorage.getItem('standupNames');
+        const arr = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(arr)) {
+          standupNames = arr;
+        }
+      } catch (_) {
+        standupNames = [];
+      }
+    }
+
+    function saveStandupNames() {
+      try {
+        sessionStorage.setItem('standupNames', JSON.stringify(standupNames));
+      } catch (_) {
+        // ignore storage errors
+      }
+    }
 
     function switchMode(mode) {
       const adminBtn = document.querySelector('.toggle-btn:last-child');
@@ -351,12 +408,24 @@
     }
 
     function deleteName(index) {
-      names.splice(index, 1);
+      const removed = names.splice(index, 1)[0];
+      if (removed) {
+        selectedNames.delete(removed);
+        saveSelectedNames();
+      }
       renderNames();
     }
 
     function clearAllNames() {
       names = [];
+      selectedNames.clear();
+      saveSelectedNames();
+      renderNames();
+    }
+
+    function clearSelections() {
+      selectedNames.clear();
+      saveSelectedNames();
       renderNames();
     }
 
@@ -387,11 +456,28 @@
                         class="name-${inputType}" 
                         id="name-${index}"
                         value="${name}"
+                        ${selectedNames.has(name) ? 'checked' : ''}
                     >
                     <label class="name-text" for="name-${index}">${name}</label>
                     ${isAdminMode ? `<button class="delete-btn" onclick="deleteName(${index})">Delete</button>` : ''}
                 </div>
             `).join('');
+
+      // Bind change handlers to persist selection
+      const inputs = namesList.querySelectorAll(`.name-${inputType}`);
+      inputs.forEach((el) => {
+        el.addEventListener('change', (e) => {
+          const target = e.target;
+          const value = target.value;
+          if (inputType === 'radio') {
+            selectedNames.clear();
+            if (target.checked) selectedNames.add(value);
+          } else {
+            if (target.checked) selectedNames.add(value); else selectedNames.delete(value);
+          }
+          saveSelectedNames();
+        });
+      });
     }
 
     // Standup list helpers (independent from main names)
@@ -401,6 +487,7 @@
       if (name && !standupNames.includes(name)) {
         standupNames.push(name);
         input.value = '';
+        saveStandupNames();
         renderStandupNames();
       }
     }
@@ -413,6 +500,7 @@
 
     function deleteStandupName(index) {
       standupNames.splice(index, 1);
+      saveStandupNames();
       renderStandupNames();
     }
 
@@ -438,6 +526,8 @@
 
     // Initialize with some sample data
     names = ['Oren', 'Derek', 'Paige', 'Joe', 'Eric', 'Orlando', 'James', 'Britt', 'Steph', 'George', 'Matt', 'Tanner', 'Alex P'];
+    loadSelectedNames();
+    loadStandupNames();
     renderNames();
     renderStandupNames();
   </script>
